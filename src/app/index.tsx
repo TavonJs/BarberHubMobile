@@ -26,16 +26,6 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  /*
-   * AGENDAMENTOS
-   *
-   * O cliente cria a solicitação.
-   * O barbeiro NÃO cria agendamentos.
-   *
-   * "numero" e a numeração sequencial do agendamento,
-   * do mais antigo (1) para o mais novo, para o barbeiro
-   * saber a ordem em que os agendamentos foram feitos.
-   */
   const [appointments, setAppointments] = useState<Appointment[]>([
     {
       id: "1",
@@ -60,7 +50,7 @@ export default function Index() {
     {
       id: "3",
       numero: 3,
-      client: "Anderson bolkonsky",
+      client: "BRUNO",
       service: "Corte + Barba",
       price: 59.9,
       time: "14:00",
@@ -455,15 +445,6 @@ export default function Index() {
           {activeTab === "agendamentos" && (
             <>
               <Text style={styles.pageHeading}>Agendamentos</Text>
-
-              <View style={styles.infoBox}>
-                <Text style={styles.infoIcon}>ℹ️</Text>
-
-                <Text style={styles.infoText}>
-                  Aqui estão todos os agendamentos, numerados do mais antigo ao
-                  mais novo.
-                </Text>
-              </View>
 
               {appointments.map((item) => (
                 <AppointmentCard
