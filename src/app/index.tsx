@@ -9,10 +9,11 @@ import {
   View,
 } from "react-native";
 
-type AppointmentStatus = "Solicitado" | "Agendado" | "Concluido" | "Cancelado";
+type AppointmentStatus = "Agendado" | "Concluido" | "Cancelado";
 
 type Appointment = {
   id: string;
+  numero: number;
   client: string;
   service: string;
   price: number;
@@ -30,10 +31,15 @@ export default function Index() {
    *
    * O cliente cria a solicitação.
    * O barbeiro NÃO cria agendamentos.
+   *
+   * "numero" e a numeração sequencial do agendamento,
+   * do mais antigo (1) para o mais novo, para o barbeiro
+   * saber a ordem em que os agendamentos foram feitos.
    */
   const [appointments, setAppointments] = useState<Appointment[]>([
     {
       id: "1",
+      numero: 1,
       client: "Schnaider",
       service: "Corte de Cabelo",
       price: 40,
@@ -43,6 +49,7 @@ export default function Index() {
     },
     {
       id: "2",
+      numero: 2,
       client: "Arthur",
       service: "Barba",
       price: 30,
@@ -52,6 +59,7 @@ export default function Index() {
     },
     {
       id: "3",
+      numero: 3,
       client: "Anderson bolkonsky",
       service: "Corte + Barba",
       price: 59.9,
@@ -61,12 +69,13 @@ export default function Index() {
     },
     {
       id: "4",
+      numero: 4,
       client: "Andrei Zakharov",
       service: "Sobrancelha",
       price: 20,
       time: "15:30",
       date: "25 MAI",
-      status: "Solicitado",
+      status: "Agendado",
     },
   ]);
 
@@ -190,11 +199,9 @@ export default function Index() {
   );
 
   /*
-   * SOLICITAÇÕES PENDENTES
+   * QUANTIDADE TOTAL DE AGENDAMENTOS
    */
-  const pendingAppointments = appointments.filter(
-    (item) => item.status === "Solicitado",
-  );
+  const totalAppointments = appointments.length;
 
   /*
    * AGENDAMENTOS ACEITOS
@@ -354,11 +361,9 @@ export default function Index() {
 
               <View style={styles.metricsGrid}>
                 <View style={styles.metricBox}>
-                  <Text style={styles.metricLabel}>SOLICITAÇÕES</Text>
+                  <Text style={styles.metricLabel}>AGENDAMENTOS</Text>
 
-                  <Text style={styles.metricValue}>
-                    {pendingAppointments.length}
-                  </Text>
+                  <Text style={styles.metricValue}>{totalAppointments}</Text>
                 </View>
 
                 <View style={styles.metricBox}>
@@ -369,25 +374,6 @@ export default function Index() {
                   </Text>
                 </View>
               </View>
-
-              {/* SOLICITAÇÕES DOS CLIENTES */}
-
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Solicitações</Text>
-              </View>
-
-              {pendingAppointments.length === 0 ? (
-                <EmptyMessage text="Nenhuma solicitação pendente." />
-              ) : (
-                pendingAppointments.map((item) => (
-                  <AppointmentCard
-                    key={item.id}
-                    item={item}
-                    formatCurrency={formatCurrency}
-                    onStatusChange={handleStatusChange}
-                  />
-                ))
-              )}
 
               {/* PRÓXIMOS ATENDIMENTOS */}
 
@@ -474,8 +460,8 @@ export default function Index() {
                 <Text style={styles.infoIcon}>ℹ️</Text>
 
                 <Text style={styles.infoText}>
-                  Os clientes fazem os pedidos de agendamento. Aqui você pode
-                  aceitar ou cancelar as solicitações.
+                  Aqui estão todos os agendamentos, numerados do mais antigo ao
+                  mais novo.
                 </Text>
               </View>
 
@@ -615,7 +601,10 @@ function AppointmentCard({
     <View style={styles.appointmentCard}>
       <View style={styles.cardTop}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.clientName}>{item.client}</Text>
+          <Text style={styles.clientName}>
+            <Text style={styles.numberTag}>#{item.numero} </Text>
+            {item.client}
+          </Text>
 
           <Text style={styles.dateText}>{item.date}</Text>
         </View>
@@ -642,26 +631,6 @@ function AppointmentCard({
           <Text style={styles.goldText}>{formatCurrency(item.price)}</Text>
         </View>
       </View>
-
-      {/* SOLICITAÇÃO DO CLIENTE */}
-
-      {item.status === "Solicitado" && (
-        <View style={styles.cardActions}>
-          <TouchableOpacity
-            style={styles.acceptButton}
-            onPress={() => onStatusChange(item.id, "Agendado")}
-          >
-            <Text style={styles.acceptText}>✓ Aceitar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => onStatusChange(item.id, "Cancelado")}
-          >
-            <Text style={styles.cancelText}>✕ Cancelar</Text>
-          </TouchableOpacity>
-        </View>
-      )}
 
       {/* ATENDIMENTO ACEITO */}
 
@@ -702,11 +671,6 @@ function StatusBadge({ status }: { status: AppointmentStatus }) {
   if (status === "Cancelado") {
     background = "#2b1111";
     color = "#e74c3c";
-  }
-
-  if (status === "Solicitado") {
-    background = "#29210c";
-    color = "#f1c40f";
   }
 
   if (status === "Agendado") {
@@ -1002,6 +966,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "700",
+  },
+
+  numberTag: {
+    color: "#d4af37",
+    fontSize: 14,
+    fontWeight: "800",
   },
 
   dateText: {
